@@ -14,12 +14,14 @@ var clearScoresButton = document.querySelector("#clear-scores");
 var hitStayButtons = document.querySelector("#hit-stay-buttons");
 
 // Stores deck ID
-// Temporarily set static deck ID for testing
-var deckID = "qwkncmc9ukhc";
+// Set temporary deck ID for testing
+var deckID = "4vkeflnrjea6";
 
 var roundScore;
 var currentUserHandValue;
 var currentDealerHandValue;
+
+// Prefer to not have card value as global variable
 // var cardValue;
 
 var totalFunds;
@@ -47,9 +49,9 @@ function init()
     hitStayButtons.children[1].addEventListener("click", stay);
 
     // Set total funds
-
     if (localStorage.getItem("Total funds") === null)
     {
+        // Need modal for this
         totalFunds = window.prompt("Please input total available funds");
 
         localStorage.setItem("Total funds", totalFunds);
@@ -59,7 +61,7 @@ function init()
 // Get deck of cards from API
 function getDeck()
 {
-    var deckofCardsRequestURL = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
+    const deckofCardsRequestURL = 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1';
 
     fetch(deckofCardsRequestURL)
         .then(function (response)
@@ -69,8 +71,13 @@ function getDeck()
         .then(function (data)
         {
             console.log(data);
+
+            // Get deck ID from API
             deckID = data.deck_id;
             console.log(deckID);
+
+            // Add DeckID to local storage
+            localStorage.setItem("DeckID", deckID);
         });
 }
 
@@ -131,18 +138,19 @@ async function drawCard()
                     resolve(cardValue);
                 }, 1000)
             })
-            
+
         });
 }
 
 // Shuffles card deck using cardID
 function shuffleDeck()
 {
-    var suffleCardRequest = 'https://deckofcardsapi.com/api/deck/' + deckID + '/shuffle/';
+    var shuffleCardRequest = 'https://deckofcardsapi.com/api/deck/' + deckID + '/shuffle/';
 
-    fetch(suffleCardRequest)
+    fetch(shuffleCardRequest)
         .then(function (response)
         {
+            console.log("Shuffled deck " + deckID);
             return response.json();
         });
 }
@@ -154,7 +162,18 @@ function determineWinner()
 
     console.log("Current hand value: " + currentUserHandValue);
 
-    // suffleDeck();
+    if (currentUserHandValue >> currentDealerHandValue)
+    {
+        win();
+    }
+
+    else if (currentUserHandValue << currentDealerHandValue)
+    {
+        lose();
+    }
+
+    // Shuffles deck for next round
+    shuffleDeck();
 }
 
 // Draw another card
@@ -170,77 +189,98 @@ async function hit()
     // Check if currentUserHandValue is equal to or over 21
     if (currentUserHandValue === 21)
     {
-        // Win function
+        win();
     }
 
     else if (currentUserHandValue >> 21)
     {
-        // Lose function
+        lose();
     }
 }
 
 // Determine winner
 function stay()
 {
-    // determineWinner();
+    determineWinner();
 }
 
 function win()
 {
     // Display modal with win text
 
+    console.log("Congradulations your win " + (betAmount * 2) + " dollars");
+
     totalFunds = totalFunds + (betAmount * 2);
+
+    localStorage.setItem("Total funds", totalFunds);
+
+    
 }
 
 function lose()
 {
     // Display modal with lose text
 
+    console.log("Sorry you lost " + betAmount + " dollars");
+
     totalFunds = totalFunds - betAmount;
+
+    localStorage.setItem("Total funds", totalFunds);
 }
 
-function roundStart()
+async function roundStart()
 {
     // Need to figure out how to have asynchronous functions wait for results before continuing
 
-    drawCard();
+    try {
 
-    var userInitialCard1;
+    const userInitialCard1 = await drawCard();
+    const userInitialCard2 = await drawCard();
 
-    var userInitialCard2;
+    currentUserHandValue = userInitialCard1 + userInitialCard2;
 
-    var userInitialTotalCardsValue;
+    const dealerInitialCard1 = await drawCard();
+    const dealerInitialCard2 = await drawCard();
 
-    var secondsLeft = 2;
+    currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
 
-    var timerInterval = setInterval(function() {
+    console.log("User initial cards value: " + currentUserHandValue);
+    console.log("Dealer initial cards value: " + currentDealerHandValue);
+    }
+
+    catch (error)
+    {
+        console.log(error);
+    }
+
+
+    /*
+    var secondsLeft = 5;
+
+    var timerInterval = setInterval(function()
+    {
         secondsLeft--;
         console.log("Time left: " + secondsLeft);
-    
-        if(secondsLeft === 0) {
-            // Stops execution of action at set interval
+
+        if (secondsLeft === 0)
+        {
             clearInterval(timerInterval);
-            userInitialCard1 = calculateCardValue();
-            userInitialTotalCardsValue = userInitialTotalCardsValue + userInitialCard1;
-            console.log("User's initial value: " + userInitialTotalCardsValue);
 
-            secondsLeft = 2;
+            console.log("User card 1 value: " + cardValue);
 
-            var timer2Interval = setInterval(function() {
-                secondsLeft--;
-                console.log("Time left: " + secondsLeft);
+            var userInitialCard1 = cardValue;
+
             
-                if(secondsLeft === 0) {
-                    // Stops execution of action at set interval
-                    clearInterval(timer2Interval);
-                    userInitialTotalCardsValue = userInitialTotalCardsValue + userInitialCard1;
-                    console.log("User's initial value: " + userInitialTotalCardsValue);
-                }
+            currentUserHandValue = userInitialCard1 + userInitialCard2;
+            currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
+
+            console.log("User initial cards value: " + currentUserHandValue);
+            console.log("Dealer initial cards value: " + currentDealerHandValue);
             
-            }, 1000);
         }
-    
-      }, 1000);
+
+    }, 1000);
+    */
 }
 
 function placeBet()
@@ -250,10 +290,18 @@ function placeBet()
     // Ask for bet amount from user
     // Use a form in a modal?
 
-    betAmount = window.prompt("How much would you like to bet?");
+    totalFunds = JSON.parse(localStorage.getItem("Total funds"));
+    parseInt(totalFunds);
 
-    localStorage.setItem("Bet amount", betAmount);
+    // Get be amount for game from user and make sure that it is less than or equal to total available funds
+    do
+    {
+        betAmount = window.prompt("How much would you like to bet?");
+        parseInt(betAmount);
+    }
+    while (betAmount > totalFunds && betAmount >> 0);
 
+    // Remove bet amount from total funds and set local storage value
     totalFunds = totalFunds - betAmount;
 
     localStorage.setItem("Total funds", totalFunds);
@@ -261,6 +309,7 @@ function placeBet()
     roundStart();
 }
 
+// This should become view funds
 function viewScores()
 {
     displayScoresContainerEl.hidden = false;
@@ -270,6 +319,7 @@ function viewScores()
 
 }
 
+// This should become clear funds
 function clearScores()
 {
     // Remove scores from local storage
@@ -278,17 +328,33 @@ function clearScores()
 function startGame()
 {
     // Hide/Show HTML elements
+    startGameButton.hidden = true;
+    viewScoresButton.hidden = true;
+
+
     roundScore = 0;
     currentUserHandValue = 0;
     currentDealerHandValue = 0;
     // cardValue = 0;
     betAmount = 0;
 
-    roundStart();
+    // This needs to finish execution before continuing
+    /*
+    if (localStorage.getItem("DeckID") === null)
+    {
+        getDeck();
+    }
 
-    // placeBet();
-    
-    // getDeck();
+    else
+    {
+        deckID = localStorage.getItem("DeckID");
+        shuffleDeck();
+    }
+    */
+
+    placeBet();
 }
 
 init();
+
+shuffleDeck();
