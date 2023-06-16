@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+<link rel = "stylesheet" href ="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel = "stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital@0;1&display=swap" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <!-------Start Quiz Button-------->
+    <div class="start_btn"><button>Start Game</button></div>
+
+    <!-------Info Box--------------->
+
+    <div class="info_box">
+        <div class="info_list"> 
+            <div class="welcome">Welcome <span>Username </span> to Lodestar Blackjack!
+                You are connecting from <span>Location</span></div>
+                <div class="info_rules"><span id="rules">Rules</span></div>
+                <div class="info">>Cards are delt out to both the palyer and dealer.</div>
+                <div class="info">>Dealer cards will remain facedown til end of the round.</div>
+                <div class="info">>All number value cards = their number (i.e. 4 spades = 4 points).</div>
+                <div class="info">>Face cards (J,K,Q) = 10 points; Ace = 11 or 1 (player decidees).</div>
+                <div class="info">>Goal is to have a higher hand than the dealer without going over 21 points.</div>
+            </div>
+        <div class="buttons">
+            <button class="quit">Exit Game</button>
+            <button class="restart">Continue</button>
+        </div>
+    </div>
+
+    <div class="quiz_box">
+        <header>
+            <div class="title">Lodestar Blackjack</div>
+        </header>
+
+        <footer>
+            <div class="total_que">
+                <span><p>2</p>of<p>5</p>Questions</span>
+            </div>
+            <button class="replay">Replay Game</button>
+        </footer>
+    </div>
+    <div class="result_box">
+            <div class="buttons">
+                <button class="restart">View Highscores</button>
+                <button class="quit">Quit Game</button>
+        </div>
+    </div>
+
+    <script src="./deck.js"> </script>
+    
+</body>
+</html>
