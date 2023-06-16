@@ -19,14 +19,21 @@ var quitGameButton = document.querySelector("#quit-game");
 // Stores deck ID
 var deckID;
 
-var roundScore;
 var currentUserHandValue;
 var currentDealerHandValue;
+
+
+// Arrays to hold card images
+var userCardImages = [];
+var dealerCardImages = [];
+
+// Boolean value to determine if user is receiving card or dealer
+var userCardDeal;
 
 var totalFunds;
 var betAmount;
 
-const initialDealCardCount = 2;
+const numberOfCardsAtStart = 2;
 
 var imgTestEl = document.querySelector("#img-test");
 
@@ -124,11 +131,23 @@ async function drawCard()
             var card = data.cards[0].image;
             console.log(card);
 
+            if (userCardDeal)
+            {
+                userCardImages.push(card);
+            }
+
+            else if (!userCardDeal)
+            {
+                dealerCardImages.push(card);
+            }
+
+            /*
             // Display card
             var testImg = document.createElement("img");
             testImg.setAttribute("src", card);
 
             imgTestEl.appendChild(testImg);
+            */
 
             // Get card value
             var cardValue = 0;
@@ -172,6 +191,15 @@ function shuffleDeck()
 // Calculate hand values and determine winner
 function determineWinner()
 {
+    // Append images of dealer cards
+    for (var i = 0; i < numberOfCardsAtStart; i++)
+    {
+        var testImg = document.createElement("img");
+        testImg.setAttribute("src", dealerCardImages[i]);
+
+        imgTestEl.appendChild(testImg);
+    }
+
     // Calculate scores
 
     console.log("Current user hand value: " + currentUserHandValue);
@@ -196,6 +224,17 @@ function determineWinner()
 // Checks for win or lose condition after cards are drawn
 function checkForWinner()
 {
+    // Append images of dealer cards
+
+    for (var i = 0; i < numberOfCardsAtStart; i++)
+    {
+        var testImg = document.createElement("img");
+        testImg.setAttribute("src", dealerCardImages[i]);
+
+        imgTestEl.appendChild(testImg);
+    }
+
+
     if (currentUserHandValue == 21 && currentDealerHandValue == 21)
     {
         tie();
@@ -231,6 +270,10 @@ async function hit()
 
     currentUserHandValue = parseInt(currentUserHandValue) + drawnCardValue;
     console.log("Current hand value: " + currentUserHandValue);
+
+    console.log(userCardImages);
+
+    // Append image of card
 
     // Check if currentUserHandValue is equal to or over 21
     checkForWinner();
@@ -276,20 +319,52 @@ function reset()
 
 async function roundStart()
 {
-    // Need to figure out how to have asynchronous functions wait for results before continuing
+    // Draw two cards for dealer
+    userCardDeal = false;
 
-    var userInitialCard1 = await drawCard();
-    var userInitialCard2 = await drawCard();
+    for (var i = 0; i < numberOfCardsAtStart; i++)
+    {
+        var dealerInitialCard = await drawCard();
+        currentDealerHandValue = currentDealerHandValue + dealerInitialCard;
+    }
 
-    currentUserHandValue = userInitialCard1 + userInitialCard2;
-
+    /*
     var dealerInitialCard1 = await drawCard();
     var dealerInitialCard2 = await drawCard();
 
     currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
+    */
 
-    console.log("User initial cards value: " + currentUserHandValue);
+    // Draw two cards for user
+    userCardDeal = true;
+
+    for (var i = 0; i < numberOfCardsAtStart; i++)
+    {
+        var userInitialCard = await drawCard();
+        currentUserHandValue = currentUserHandValue + userInitialCard;
+    }
+
+    /*
+    var userInitialCard1 = await drawCard();
+    var userInitialCard2 = await drawCard();
+
+    currentUserHandValue = userInitialCard1 + userInitialCard2;
+    */
+
     console.log("Dealer initial cards value: " + currentDealerHandValue);
+    console.log("User initial cards value: " + currentUserHandValue);
+    
+    console.log(userCardImages);
+    console.log(dealerCardImages);
+
+    // Append images of user cards
+    for (var i = 0; i < numberOfCardsAtStart; i++)
+    {
+        var testImg = document.createElement("img");
+        testImg.setAttribute("src", userCardImages[i]);
+
+        imgTestEl.appendChild(testImg);
+    }
 
     checkForWinner();
 }
@@ -349,6 +424,10 @@ function startGame()
     currentUserHandValue = 0;
     currentDealerHandValue = 0;
     betAmount = 0;
+
+    // Remove any card images from previous game from arrays
+    userCardImages = [];
+    dealerCardImages = [];
 
     if (localStorage.getItem("Total funds") === null || localStorage.getItem("Total funds") <= 0)
     {
