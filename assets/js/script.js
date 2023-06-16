@@ -4,25 +4,24 @@
 var welcomeContainerEl = document.querySelector("#welcome");
 var gameContainerEl = document.querySelector("#game-container");
 var fundsContainerEl = document.querySelector("#funds");
-var displayScoresContainerEl = document.querySelector("#display-scores");
+var displayFundsContainerEl = document.querySelector("#view-funds-container");
 
 // Buttons
 var startGameButton = document.querySelector("#start-game");
-var viewScoresButton = document.querySelector("#view-scores");
-var clearScoresButton = document.querySelector("#clear-scores");
+var viewFundsButton = document.querySelector("#view-funds-button");
+var clearFundsButton = document.querySelector("#clear-funds-button");
+var returnFromFundsButton = document.querySelector("#return-button");
 
 var hitStayButtons = document.querySelector("#hit-stay-buttons");
 
+var quitGameButton = document.querySelector("#quit-game");
+
 // Stores deck ID
-// Set temporary deck ID for testing
-var deckID = "4vkeflnrjea6";
+var deckID;
 
 var roundScore;
 var currentUserHandValue;
 var currentDealerHandValue;
-
-// Prefer to not have card value as global variable
-// var cardValue;
 
 var totalFunds;
 var betAmount;
@@ -35,27 +34,52 @@ var imgTestEl = document.querySelector("#img-test");
 function init()
 {
     // Hide HTML elements
-    // gameContainerEl.hidden = true;
+    gameContainerEl.hidden = true;
     fundsContainerEl.hidden = true;
-    displayScoresContainerEl.hidden = true;
+    displayFundsContainerEl.hidden = true;
 
     // Add event listeners
     startGameButton.addEventListener("click", startGame);
-    viewScoresButton.addEventListener("click", viewScores);
-
-    clearScoresButton.addEventListener("click", clearScores);
+    viewFundsButton.addEventListener("click", viewFunds);
+    clearFundsButton.addEventListener("click", clearFunds);
+    returnFromFundsButton.addEventListener("click", reset);
 
     hitStayButtons.children[0].addEventListener("click", hit);
     hitStayButtons.children[1].addEventListener("click", stay);
 
-    // Set total funds
-    if (localStorage.getItem("Total funds") === null)
-    {
-        // Need modal for this
-        totalFunds = window.prompt("Please input total available funds");
+    quitGameButton.addEventListener("click", reset);
 
-        localStorage.setItem("Total funds", totalFunds);
+    if (localStorage.getItem("Username") === null)
+    {
+        getUsername();
     }
+
+    if (localStorage.getItem("DeckID") === null)
+    {
+        getDeck();
+    }
+
+    else
+    {
+        deckID = localStorage.getItem("DeckID");
+    }
+}
+
+function getUsername()
+{
+    // Need modal for this
+    var username = window.prompt("What is your name?");
+
+    localStorage.setItem("Username", username);
+}
+
+// Set total funds
+function getFunds()
+{
+    // Need modal for this
+    totalFunds = window.prompt("Please input total available funds");
+
+    localStorage.setItem("Total funds", totalFunds);
 }
 
 // Get deck of cards from API
@@ -88,58 +112,48 @@ async function drawCard()
 
     console.log(drawCardRequestURL);
     
-    fetch(drawCardRequestURL)
+    var response = fetch(drawCardRequestURL)
         .then(function (response)
         {
             return response.json();
         })
         .then(function (data)
         {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log(data);
+            console.log(data);
 
-                    var card = data.cards[0].image;
-                    console.log(card);
+            var card = data.cards[0].image;
+            console.log(card);
 
-                    // Display card
-                    var testImg = document.createElement("img");
-                    testImg.setAttribute("src", card);
+            // Display card
+            var testImg = document.createElement("img");
+            testImg.setAttribute("src", card);
 
-                    imgTestEl.appendChild(testImg);
+            imgTestEl.appendChild(testImg);
 
-                    // Get card value
-                    var cardValue = 0;
+            // Get card value
+            var cardValue = 0;
 
-                    cardValue = data.cards[0].value;
+            cardValue = data.cards[0].value;
 
-                    // Determine card value as number
+            // Determine card value as number
 
-                    // Check if card is face card and change value to number
-                    if (cardValue == "ACE")
-                    {
-                        // Check current score to see if ace will be worth 1 or 11
-                        console.log("Ace");
+            // Check if card is face card and change value to number
+            if (cardValue == "ACE")
+            {
+                cardValue = 11;
+            }
 
-                        cardValue = 11;
-                    }
+            else if (cardValue == "JACK" || cardValue == "QUEEN" || cardValue == "KING")
+            {
+                cardValue = 10;
+            }
 
-                    else if (cardValue == "JACK" || cardValue == "QUEEN" || cardValue == "KING")
-                    {
-                        cardValue = 10;
-                    }
+            console.log("Card value: " + cardValue);
 
-                    parseInt(cardValue);
-
-                    console.log("Card value: " + cardValue);
-
-                    // return cardValue;
-
-                    resolve(cardValue);
-                }, 1000)
-            })
-
+            return parseInt(cardValue);
         });
+        
+    return response;
 }
 
 // Shuffles card deck using cardID
@@ -160,20 +174,52 @@ function determineWinner()
 {
     // Calculate scores
 
-    console.log("Current hand value: " + currentUserHandValue);
+    console.log("Current user hand value: " + currentUserHandValue);
+    console.log("Current dealer hand value: " + currentDealerHandValue);
 
-    if (currentUserHandValue >> currentDealerHandValue)
+    if (currentUserHandValue == currentDealerHandValue)
+    {
+        tie();
+    }
+
+    else if (currentUserHandValue > currentDealerHandValue)
     {
         win();
     }
 
-    else if (currentUserHandValue << currentDealerHandValue)
+    else if (currentUserHandValue < currentDealerHandValue)
+    {
+        lose();
+    }
+}
+
+// Checks for win or lose condition after cards are drawn
+function checkForWinner()
+{
+    if (currentUserHandValue == 21 && currentDealerHandValue == 21)
+    {
+        tie();
+    }
+
+    else if (currentUserHandValue == 21)
+    {
+        win();
+    }
+
+    else if (currentUserHandValue > 21)
     {
         lose();
     }
 
-    // Shuffles deck for next round
-    shuffleDeck();
+    else if (currentDealerHandValue == 21)
+    {
+        lose();
+    }
+
+    else if (currentDealerHandValue > 21)
+    {
+        win();
+    }
 }
 
 // Draw another card
@@ -187,15 +233,7 @@ async function hit()
     console.log("Current hand value: " + currentUserHandValue);
 
     // Check if currentUserHandValue is equal to or over 21
-    if (currentUserHandValue === 21)
-    {
-        win();
-    }
-
-    else if (currentUserHandValue >> 21)
-    {
-        lose();
-    }
+    checkForWinner();
 }
 
 // Determine winner
@@ -213,74 +251,47 @@ function win()
     totalFunds = totalFunds + (betAmount * 2);
 
     localStorage.setItem("Total funds", totalFunds);
-
-    
 }
 
 function lose()
 {
     // Display modal with lose text
-
     console.log("Sorry you lost " + betAmount + " dollars");
+}
 
-    totalFunds = totalFunds - betAmount;
+function tie()
+{
+    console.log("Game is tied.  " + betAmount + " dollars are being returned to your total funds");
+
+    totalFunds = totalFunds + betAmount;
 
     localStorage.setItem("Total funds", totalFunds);
+}
+
+// Return to main menu if user wants to quit during game or after completion
+function reset()
+{
+    location.reload();
 }
 
 async function roundStart()
 {
     // Need to figure out how to have asynchronous functions wait for results before continuing
 
-    try {
-
-    const userInitialCard1 = await drawCard();
-    const userInitialCard2 = await drawCard();
+    var userInitialCard1 = await drawCard();
+    var userInitialCard2 = await drawCard();
 
     currentUserHandValue = userInitialCard1 + userInitialCard2;
 
-    const dealerInitialCard1 = await drawCard();
-    const dealerInitialCard2 = await drawCard();
+    var dealerInitialCard1 = await drawCard();
+    var dealerInitialCard2 = await drawCard();
 
     currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
 
     console.log("User initial cards value: " + currentUserHandValue);
     console.log("Dealer initial cards value: " + currentDealerHandValue);
-    }
 
-    catch (error)
-    {
-        console.log(error);
-    }
-
-
-    /*
-    var secondsLeft = 5;
-
-    var timerInterval = setInterval(function()
-    {
-        secondsLeft--;
-        console.log("Time left: " + secondsLeft);
-
-        if (secondsLeft === 0)
-        {
-            clearInterval(timerInterval);
-
-            console.log("User card 1 value: " + cardValue);
-
-            var userInitialCard1 = cardValue;
-
-            
-            currentUserHandValue = userInitialCard1 + userInitialCard2;
-            currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
-
-            console.log("User initial cards value: " + currentUserHandValue);
-            console.log("Dealer initial cards value: " + currentDealerHandValue);
-            
-        }
-
-    }, 1000);
-    */
+    checkForWinner();
 }
 
 function placeBet()
@@ -309,52 +320,44 @@ function placeBet()
     roundStart();
 }
 
-// This should become view funds
-function viewScores()
+// View user's total funds
+function viewFunds()
 {
-    displayScoresContainerEl.hidden = false;
-
-    // Need to add return button to HTML
-
-
+    displayFundsContainerEl.hidden = false;
 }
 
-// This should become clear funds
-function clearScores()
+// Remove funds from local storage
+function clearFunds()
 {
-    // Remove scores from local storage
+    // Remove funds from local storage
+    if (localStorage.getItem("Total funds") !== null)
+    {
+        localStorage.removeItem("Total funds");
+    }
 }
 
 function startGame()
 {
     // Hide/Show HTML elements
     startGameButton.hidden = true;
-    viewScoresButton.hidden = true;
+    viewFundsButton.hidden = true;
 
+    gameContainerEl.hidden = false;
 
+    // Set values to 0
     roundScore = 0;
     currentUserHandValue = 0;
     currentDealerHandValue = 0;
-    // cardValue = 0;
     betAmount = 0;
 
-    // This needs to finish execution before continuing
-    /*
-    if (localStorage.getItem("DeckID") === null)
+    if (localStorage.getItem("Total funds") === null || localStorage.getItem("Total funds") <= 0)
     {
-        getDeck();
+        getFunds();
     }
 
-    else
-    {
-        deckID = localStorage.getItem("DeckID");
-        shuffleDeck();
-    }
-    */
-
+    // Shuffle deck and have user place bet
+    shuffleDeck();
     placeBet();
 }
 
 init();
-
-shuffleDeck();
