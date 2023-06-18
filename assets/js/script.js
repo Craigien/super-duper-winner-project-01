@@ -7,21 +7,26 @@ var fundsContainerEl = document.querySelector("#funds");
 var displayFundsContainerEl = document.querySelector("#view-funds-container");
 
 // Buttons
-var startGameButton = document.querySelector("#start-game");
-var viewFundsButton = document.querySelector("#view-funds-button");
+var startGameButton = document.querySelector("#quick");
+var viewFundsButton = document.querySelector("#view");
 var clearFundsButton = document.querySelector("#clear-funds-button");
 var returnFromFundsButton = document.querySelector("#return-button");
 
 var hitStayButtons = document.querySelector("#hit-stay-buttons");
+var hitButton = document.querySelector("#hit");
+var stayButton = document.querySelector("#stay");
 
-var quitGameButton = document.querySelector("#quit-game");
+var quitGameButton = document.querySelector("#quit");
+
+// Card image elements
+var userCardImageDivEl = document.querySelector("#your-cards");
+var dealerCardImageDivEl = document.querySelector("#dealer-cards");
 
 // Stores deck ID
 var deckID;
 
 var currentUserHandValue;
 var currentDealerHandValue;
-
 
 // Arrays to hold card images
 var userCardImages = [];
@@ -30,14 +35,18 @@ var dealerCardImages = [];
 // Boolean value to determine if user is receiving card or dealer
 var userCardDeal;
 
+// Holds number of cards user has
+var userCardCount;
+
 var totalFunds;
 var betAmount;
 
+var totalFundsViewEl = document.querySelector("#funds-amount");
+
 const numberOfCardsAtStart = 2;
 
-var imgTestEl = document.querySelector("#img-test");
 
-
+// Run on page load
 function init()
 {
     // Hide HTML elements
@@ -51,8 +60,8 @@ function init()
     clearFundsButton.addEventListener("click", clearFunds);
     returnFromFundsButton.addEventListener("click", reset);
 
-    hitStayButtons.children[0].addEventListener("click", hit);
-    hitStayButtons.children[1].addEventListener("click", stay);
+    hitButton.addEventListener("click", hit);
+    stayButton.addEventListener("click", stay);
 
     quitGameButton.addEventListener("click", reset);
 
@@ -141,14 +150,6 @@ async function drawCard()
                 dealerCardImages.push(card);
             }
 
-            /*
-            // Display card
-            var testImg = document.createElement("img");
-            testImg.setAttribute("src", card);
-
-            imgTestEl.appendChild(testImg);
-            */
-
             // Get card value
             var cardValue = 0;
 
@@ -194,10 +195,7 @@ function determineWinner()
     // Append images of dealer cards
     for (var i = 0; i < numberOfCardsAtStart; i++)
     {
-        var testImg = document.createElement("img");
-        testImg.setAttribute("src", dealerCardImages[i]);
-
-        imgTestEl.appendChild(testImg);
+        dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
     }
 
     // Calculate scores
@@ -224,40 +222,59 @@ function determineWinner()
 // Checks for win or lose condition after cards are drawn
 function checkForWinner()
 {
-    // Append images of dealer cards
-
-    for (var i = 0; i < numberOfCardsAtStart; i++)
-    {
-        var testImg = document.createElement("img");
-        testImg.setAttribute("src", dealerCardImages[i]);
-
-        imgTestEl.appendChild(testImg);
-    }
-
-
     if (currentUserHandValue == 21 && currentDealerHandValue == 21)
     {
         tie();
+
+        // Append images of dealer cards
+        for (var i = 0; i < numberOfCardsAtStart; i++)
+        {
+            dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
+        }
     }
 
     else if (currentUserHandValue == 21)
     {
         win();
+
+        // Append images of dealer cards
+        for (var i = 0; i < numberOfCardsAtStart; i++)
+        {
+            dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
+        }
     }
 
     else if (currentUserHandValue > 21)
     {
         lose();
+
+        // Append images of dealer cards
+        for (var i = 0; i < numberOfCardsAtStart; i++)
+        {
+            dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
+        }
     }
 
     else if (currentDealerHandValue == 21)
     {
         lose();
+
+        // Append images of dealer cards
+        for (var i = 0; i < numberOfCardsAtStart; i++)
+        {
+            dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
+        }
     }
 
     else if (currentDealerHandValue > 21)
     {
         win();
+
+        // Append images of dealer cards
+        for (var i = 0; i < numberOfCardsAtStart; i++)
+        {
+            dealerCardImageDivEl.children[i].setAttribute("src", dealerCardImages[i]);
+        }
     }
 }
 
@@ -273,7 +290,14 @@ async function hit()
 
     console.log(userCardImages);
 
+    userCardCount++;
+
     // Append image of card
+
+    var cardImage = document.createElement("img");
+    cardImage.setAttribute("src", userCardImages[userCardCount - 1]);
+
+    userCardImageDivEl.appendChild(cardImage);
 
     // Check if currentUserHandValue is equal to or over 21
     checkForWinner();
@@ -287,6 +311,9 @@ function stay()
 
 function win()
 {
+    hitButton.hidden = true;
+    stayButton.hidden = true;
+    
     // Display modal with win text
 
     console.log("Congradulations your win " + (betAmount * 2) + " dollars");
@@ -298,12 +325,18 @@ function win()
 
 function lose()
 {
+    hitButton.hidden = true;
+    stayButton.hidden = true;
+
     // Display modal with lose text
     console.log("Sorry you lost " + betAmount + " dollars");
 }
 
 function tie()
 {
+    hitButton.hidden = true;
+    stayButton.hidden = true;
+
     console.log("Game is tied.  " + betAmount + " dollars are being returned to your total funds");
 
     totalFunds = totalFunds + betAmount;
@@ -319,6 +352,10 @@ function reset()
 
 async function roundStart()
 {
+    // Display bet amount and total funds
+    fundsContainerEl.children[0].children[0].textContent = "Current Bet: " + betAmount;
+    fundsContainerEl.children[1].children[0].textContent = "Total Funds: " + localStorage.getItem("Total funds");
+
     // Draw two cards for dealer
     userCardDeal = false;
 
@@ -326,14 +363,8 @@ async function roundStart()
     {
         var dealerInitialCard = await drawCard();
         currentDealerHandValue = currentDealerHandValue + dealerInitialCard;
+        userCardCount++;
     }
-
-    /*
-    var dealerInitialCard1 = await drawCard();
-    var dealerInitialCard2 = await drawCard();
-
-    currentDealerHandValue = dealerInitialCard1 + dealerInitialCard2;
-    */
 
     // Draw two cards for user
     userCardDeal = true;
@@ -344,13 +375,6 @@ async function roundStart()
         currentUserHandValue = currentUserHandValue + userInitialCard;
     }
 
-    /*
-    var userInitialCard1 = await drawCard();
-    var userInitialCard2 = await drawCard();
-
-    currentUserHandValue = userInitialCard1 + userInitialCard2;
-    */
-
     console.log("Dealer initial cards value: " + currentDealerHandValue);
     console.log("User initial cards value: " + currentUserHandValue);
     
@@ -360,10 +384,10 @@ async function roundStart()
     // Append images of user cards
     for (var i = 0; i < numberOfCardsAtStart; i++)
     {
-        var testImg = document.createElement("img");
-        testImg.setAttribute("src", userCardImages[i]);
+        var cardImage = document.createElement("img");
+        cardImage.setAttribute("src", userCardImages[i]);
 
-        imgTestEl.appendChild(testImg);
+        userCardImageDivEl.appendChild(cardImage);
     }
 
     checkForWinner();
@@ -399,6 +423,16 @@ function placeBet()
 function viewFunds()
 {
     displayFundsContainerEl.hidden = false;
+
+    if (localStorage.getItem("Total funds") === null)
+    {
+        totalFundsViewEl.textContent = "Total funds: $0";
+    }
+
+    else
+    {
+        totalFundsViewEl.textContent = "Total funds: $" + localStorage.getItem("Total funds");
+    }
 }
 
 // Remove funds from local storage
@@ -408,6 +442,7 @@ function clearFunds()
     if (localStorage.getItem("Total funds") !== null)
     {
         localStorage.removeItem("Total funds");
+        totalFundsViewEl.textContent = "Total funds: $0";
     }
 }
 
@@ -416,14 +451,19 @@ function startGame()
     // Hide/Show HTML elements
     startGameButton.hidden = true;
     viewFundsButton.hidden = true;
+    fundsContainerEl.hidden = false;
 
     gameContainerEl.hidden = false;
+
+    hitButton.hidden = false;
+    stayButton.hidden = false;
 
     // Set values to 0
     roundScore = 0;
     currentUserHandValue = 0;
     currentDealerHandValue = 0;
     betAmount = 0;
+    userCardCount = 0;
 
     // Remove any card images from previous game from arrays
     userCardImages = [];
