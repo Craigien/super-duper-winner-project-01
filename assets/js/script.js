@@ -22,6 +22,26 @@ var quitGameButton = document.querySelector("#quit");
 var userCardImageDivEl = document.querySelector("#your-cards");
 var dealerCardImageDivEl = document.querySelector("#dealer-cards");
 
+// Modals
+var winModalEl = new bootstrap.Modal(document.querySelector("#win-modal"));
+var winModalTextEl = document.querySelector("#win");
+var loseModalEl = new bootstrap.Modal(document.querySelector("#lose-modal"));
+var loseModalTextEl = document.querySelector("#lose");
+var tieModalEl = new bootstrap.Modal(document.querySelector("#tie-modal"));
+var tieModelTextEl = document.querySelector("#tie");
+
+var usernameModalEl = new bootstrap.Modal(document.querySelector("#username-modal"));
+var usernameSubmitButton = document.querySelector("#username-submit");
+var usernameInput = document.querySelector("#username");
+
+var totalFundsModalEl = new bootstrap.Modal(document.querySelector("#total-funds-modal"));
+var totalFundsSubmitButton = document.querySelector("#total-funds-submit");
+var totalFundsInput = document.querySelector("#total-funds");
+
+var betAmountModalEl = new bootstrap.Modal(document.querySelector("#bet-amount-modal"));
+var betAmountSubmitButton = document.querySelector("#bet-amount-submit");
+var betAmountInput = document.querySelector("#bet-amount");
+
 // Stores deck ID
 var deckID;
 
@@ -59,6 +79,9 @@ function init()
     viewFundsButton.addEventListener("click", viewFunds);
     clearFundsButton.addEventListener("click", clearFunds);
     returnFromFundsButton.addEventListener("click", reset);
+    usernameSubmitButton.addEventListener("click", saveUsername);
+    totalFundsSubmitButton.addEventListener("click", saveTotalFunds);
+    betAmountSubmitButton.addEventListener("click", placeBet);
 
     hitButton.addEventListener("click", hit);
     stayButton.addEventListener("click", stay);
@@ -79,23 +102,39 @@ function init()
     {
         deckID = localStorage.getItem("DeckID");
     }
+
+    if (localStorage.getItem("Total funds") === null || localStorage.getItem("Total funds") <= 0)
+    {
+        getFunds();
+    }
 }
 
+// Show get username modal
 function getUsername()
 {
-    // Need modal for this
-    var username = window.prompt("What is your name?");
-
-    localStorage.setItem("Username", username);
+    usernameModalEl.show();
 }
 
-// Set total funds
+// Get username input from form in modal and save to local storage
+function saveUsername(event)
+{
+    event.preventDefault();
+
+    localStorage.setItem("Username", usernameInput.value);
+}
+
+// Show get funds modal
 function getFunds()
 {
-    // Need modal for this
-    totalFunds = window.prompt("Please input total available funds");
+    totalFundsModalEl.show();
+}
 
-    localStorage.setItem("Total funds", totalFunds);
+// Get total funds from form in modal and save to local storage
+function saveTotalFunds(event)
+{
+    event.preventDefault();
+
+    localStorage.setItem("Total funds", totalFundsInput.value);
 }
 
 // Get deck of cards from API
@@ -315,6 +354,8 @@ function win()
     stayButton.hidden = true;
     
     // Display modal with win text
+    winModalTextEl.textContent = "Congradulations, you win " + (betAmount * 2) + " dollars";
+    winModalEl.show();
 
     console.log("Congradulations your win " + (betAmount * 2) + " dollars");
 
@@ -329,6 +370,18 @@ function lose()
     stayButton.hidden = true;
 
     // Display modal with lose text
+    if (betAmount <= 1)
+    {
+        loseModalTextEl.textContent = "Sorry you lost " + betAmount + " dollar";
+        loseModalEl.show();
+    }
+
+    else
+    {
+        loseModalTextEl.textContent = "Sorry you lost " + betAmount + " dollars";
+        loseModalEl.show();
+    }
+
     console.log("Sorry you lost " + betAmount + " dollars");
 }
 
@@ -337,9 +390,22 @@ function tie()
     hitButton.hidden = true;
     stayButton.hidden = true;
 
+    // Display modal with tie text
+    if (betAmount <= 1)
+    {
+        tieModelTextEl.textContent = "Game is tied.  " + betAmount + " dollar is being returned to your total funds";
+        tieModalEl.show();
+    }
+
+    else
+    {
+        tieModelTextEl.textContent = "Game is tied.  " + betAmount + " dollars are being returned to your total funds";
+        tieModalEl.show();
+    }
+
     console.log("Game is tied.  " + betAmount + " dollars are being returned to your total funds");
 
-    totalFunds = totalFunds + betAmount;
+    totalFunds = parseInt(totalFunds) + parseInt(betAmount);
 
     localStorage.setItem("Total funds", totalFunds);
 }
@@ -352,9 +418,11 @@ function reset()
 
 async function roundStart()
 {
+    totalFunds = parseInt(localStorage.getItem("Total funds"));
+
     // Display bet amount and total funds
-    fundsContainerEl.children[0].children[0].textContent = "Current Bet: " + betAmount;
-    fundsContainerEl.children[1].children[0].textContent = "Total Funds: " + localStorage.getItem("Total funds");
+    fundsContainerEl.children[0].children[0].textContent = "Current Bet: $" + betAmount;
+    fundsContainerEl.children[1].children[0].textContent = "Total Funds: $" + totalFunds;
 
     // Draw two cards for dealer
     userCardDeal = false;
@@ -393,23 +461,39 @@ async function roundStart()
     checkForWinner();
 }
 
-function placeBet()
+function placeBet(event)
 {
     // Get total funds from local storage
-
-    // Ask for bet amount from user
-    // Use a form in a modal?
-
     totalFunds = JSON.parse(localStorage.getItem("Total funds"));
     parseInt(totalFunds);
 
+    // Ask for bet amount from user
+    event.preventDefault();
+
+    betAmount = betAmountInput.value;
+
+    parseInt(betAmount);
+
+    /*
+    if (betAmount > totalFunds || betAmount <= 0)
+    {
+        location.reload();
+    }
+    */
+
     // Get be amount for game from user and make sure that it is less than or equal to total available funds
+    /*
     do
     {
-        betAmount = window.prompt("How much would you like to bet?");
-        parseInt(betAmount);
+        betAmountModalEl.show();
+
+        // betAmount = saveBetAmount();
+
+        // betAmount = window.prompt("How much would you like to bet?");
+        // parseInt(betAmount);
     }
-    while (betAmount > totalFunds && betAmount >> 0);
+    while (betAmount > totalFunds && betAmount > 0);
+    */
 
     // Remove bet amount from total funds and set local storage value
     totalFunds = totalFunds - betAmount;
@@ -469,14 +553,11 @@ function startGame()
     userCardImages = [];
     dealerCardImages = [];
 
-    if (localStorage.getItem("Total funds") === null || localStorage.getItem("Total funds") <= 0)
-    {
-        getFunds();
-    }
-
     // Shuffle deck and have user place bet
     shuffleDeck();
-    placeBet();
+
+    // Asks for user to input bet amount
+    betAmountModalEl.show();
 }
 
 init();
