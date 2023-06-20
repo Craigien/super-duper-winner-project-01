@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+          rel="stylesheet" 
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" 
+          crossorigin="anonymous" />
+      <link rel="stylesheet" href="./assets/css/style.css" />
+      <link rel = "stylesheet" href ="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      
+    <title>Lodestar Blackjack</title>
+</head>
+
+<body>
+  <section>
+    <div class="logo">
+      <img src="./assets/images/cards/Picture2.png">
+    </div>
+    <div class="background">
+      <img src="./assets/images/cards/Picture4.png">
+    </div>
+  </section>
+
+
+  <div class="title">
+    <p>Welcome <span>username</span> to Lodestar Blackjack!
+    You are connecting from <span>location</span></p>
+  </div>
+
+  <section id="game-container">
+    <div class="dealer-cards" id="dealer-cards">
+      <img src="./assets/images/cards/BACK.png">
+      <img src="./assets/images/cards/BACK.png">
+    </div>
+
+    <div class="your-cards" id="your-cards">
+      
+    </div>
+
+    <div class="buttons">
+      <button id="quit">Quit</button>
+      <!-- <button id="restart">Restart</button> -->
+    </div>
+
+    <br>
+    <div class="btns">
+      <button id="hit">Hit</button>
+      <button id="stay">Stay</button>
+    </div>
+  </section>
+  <p id="results"></p>
+
+
+  <br>
+
+  <section id="funds">
+    <div class="bet">
+      <h2>Current Bet:</h2>
+    </div>
+    <div class="total">
+      <h2>Total Funds:</h2>
+    </div>
+  </section>
+
+  <section>
+    <div class="buttons">
+      <!-- <button id="quit">Quit</button> -->
+      <!-- <button id="restart">Restart</button> -->
+      <button id="quick">Quick Play</button>
+      <button id="view">View Funds</button>
+      
+    </div>
+  </section>
+
+  <section id="view-funds-container">
+    <h4 id="funds-amount"></h4>
+    <button id="clear-funds-button">Clear funds</button>
+    <button id="return-button">Return to Main Menu</button>
+  </section>
+
+  <!-- Modal that displays on game win -->
+  <div class="modal" id="win-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">You Win!!!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="win"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal that displays on game lose -->
+  <div class="modal" id="lose-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Sorry, you lost</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="lose"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal that displays on game tie -->
+  <div class="modal" id="tie-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tie game</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="tie"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for username input -->
+  <div class="modal fade" id="username-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Please enter your name</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="username" class="col-form-label">Your name: </label>
+              <input type="text" class="form-control" id="username">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="username-submit" data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for total funds -->
+  <div class="modal fade" id="total-funds-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Please enter total funds</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="total-funds" class="col-form-label">Total funds: </label>
+              <input type="text" class="form-control" id="total-funds">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="total-funds-submit" data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="bet-amount-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Please enter bet amount</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="bet-amount" class="col-form-label">Bet amount: </label>
+              <input type="text" class="form-control" id="bet-amount">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="bet-amount-submit" data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" 
+integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" 
+crossorigin="anonymous"></script>
+
+<script src="./assets/js/script.js"></script>
+
+</html>

@@ -1,0 +1,199 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+.dealer-cards {
+    position:absolute;
+    left: 43%;
+    top: 22%;
+    
+}
+
+#dealer-cards img {
+    height: 175px;
+    width: 125px;
+    margin-bottom: 100px;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.your-cards {
+    position: absolute;
+    left: 37%;
+    top: 60%;
+}
+
+#your-cards img{
+    height: 175;
+    width: 125px;
+    margin: 1px;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.dealer {
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+}
+
+.you {
+    position: absolute;
+    top: 82%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+}
+
+.btns{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+    justify-content: center;    
+}
+
+.btns #hit {
+    font-size: 20px;
+    padding: 15px 30px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.btns #stay {
+    font-size: 20px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+.bet {
+    position: absolute;
+    top: 76%;
+    left: 80%;
+    width: 18%;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.total {
+    position: absolute;
+    top: 83%;
+    left: 80%;
+    width: 18%;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.buttons #quit{
+    font-size: 20px;
+    position: absolute;
+    left: 10%;
+    top: 5%;
+    width: 3%;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+
+.buttons #quit:hover,
+.buttons #restart:hover,
+.btns #stay:hover,
+.btns #hit:hover,
+.buttons #quick:hover,
+.buttons #view:hover {
+    background-color: #D8E0D8;
+    cursor: pointer;
+}
+
+.buttons #restart{
+    font-size: 20px;
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    width: 4%;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.buttons #quick{
+    font-size: 20px;
+    position: absolute;
+    left: 80%;
+    top: 90%;
+    width: 7%;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.buttons #view{
+    font-size: 20px;
+    position: absolute;
+    left: 88%;
+    top: 90%;
+    width: 10%;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px 0 rgba(0,0,0,0.2),
+                0px 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.background img{
+    height:80%;
+    width: 80%;
+    position: absolute;
+    left: 11%;
+    top: 14%;
+
+}
+
+.title {
+    font-size: 30px;
+    color: black;
+    position: absolute;
+    top: 7%;
+    left: 28%;
+}
+
+.title span {
+    color: lightskyblue;
+    font-weight: 700;
+}
+
+.logo img{
+   height: 175px;
+   width: 175px;
+   scale: 0.7;
+   position: absolute;
+   left: 20%;
+   top: -2%;
+}
