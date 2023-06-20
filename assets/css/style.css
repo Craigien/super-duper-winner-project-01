@@ -182,13 +182,17 @@ h2 {
     position: absolute;
     top: 7%;
     left: 32%;
-    text-decoration: underline;
 }
 
+.title span {
+    color: lightskyblue;
+    font-weight: 700;
+}
 .logo img{
    height: 175px;
    width: 175px;
    scale: 0.7;
    position: absolute;
-   left: 60%;
+   left: 20%;
+   top: -2%;
 }

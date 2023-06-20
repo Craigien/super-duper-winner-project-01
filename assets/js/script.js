@@ -1,10 +1,13 @@
 // Global variables
 
+
 // Containers
 var welcomeContainerEl = document.querySelector("#welcome");
 var gameContainerEl = document.querySelector("#game-container");
 var fundsContainerEl = document.querySelector("#funds");
 var displayFundsContainerEl = document.querySelector("#view-funds-container");
+var usernameSpanEl = document.querySelector("#username-text");
+var locationSpanEl = document.querySelector("#location-text");
 
 // Buttons
 var startGameButton = document.querySelector("#quick");
@@ -107,6 +110,26 @@ function init()
     {
         getFunds();
     }
+    getLocation();
+}
+
+function getLocation()
+{
+    var locationRequestUrl = "https://get.geojs.io/v1/ip/geo.json";
+    fetch(locationRequestUrl)
+        .then(function (response)
+        {
+            return response.json();
+        })
+        .then(function (data)
+        {
+            console.log(data);
+            var city = data.city;
+            var state = data.region;
+            usernameSpanEl.textContent = localStorage.getItem("Username");
+            locationSpanEl.textContent = city + ", " + state;
+
+        })
 }
 
 // Show get username modal
@@ -121,6 +144,7 @@ function saveUsername(event)
     event.preventDefault();
 
     localStorage.setItem("Username", usernameInput.value);
+    reset();
 }
 
 // Show get funds modal
