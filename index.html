@@ -14,6 +14,8 @@
 </head>
 
 <body>
+
+  <!-- Displays logo and background image -->
   <section>
     <div class="logo">
       <img src="./assets/images/cards/Picture2.png">
@@ -23,29 +25,31 @@
     </div>
   </section>
 
-
+<!-- Displays title message -->
   <div class="title" id="title">
-    <p>Welcome <span id="username-text">username</span> to Lodestar Blackjack!
-      You are connecting from <span id="location-text">location</span></p>
+    <p>Welcome <span id="username-text">username</span> to Lodestar Blackjack!</p>
+      <p>You are connecting from <span id="location-text">location</span></p>
   </div>
 
+  <!-- Displays blank dealer cards -->
   <section id="game-container">
     <div class="dealer-cards" id="dealer-cards">
       <img src="./assets/images/cards/BACK.png">
       <img src="./assets/images/cards/BACK.png">
     </div>
 
-    <div class="your-cards" id="your-cards">
-
-      
+    <!-- Displays user cards -->
+    <div class="your-cards" id="your-cards"> 
     </div>
 
+    <!-- Displays quit button -->
     <div class="buttons">
       <button id="quit">Quit</button>
-      <!-- <button id="restart">Restart</button> -->
     </div>
 
     <br>
+
+    <!-- Displays hit and stay buttons -->
     <div class="btns">
       <button id="hit">Hit</button>
       <button id="stay">Stay</button>
@@ -53,9 +57,9 @@
   </section>
   <p id="results"></p>
 
-
   <br>
 
+  <!-- Displays total funds and current bet during game -->
   <section id="funds">
     <div class="bet">
       <h2>Current Bet:</h2>
@@ -65,16 +69,15 @@
     </div>
   </section>
 
+  <!-- Displays quick view and display funds buttons -->
   <section>
     <div class="buttons">
-      <!-- <button id="quit">Quit</button> -->
-      <!-- <button id="restart">Restart</button> -->
       <button id="quick">Quick Play</button>
       <button id="view">View Funds</button>
-      
     </div>
   </section>
 
+  <!-- Displays total available funds and allows for clearing  the funds -->
   <section id="view-funds-container">
     <h4 id="funds-amount"></h4>
     <button id="clear-funds-button">Clear funds</button>
@@ -181,6 +184,7 @@
     </div>
   </div>
 
+  <!-- Modal for bet amount -->
   <div class="modal fade" id="bet-amount-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">

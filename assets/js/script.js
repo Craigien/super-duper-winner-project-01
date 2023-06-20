@@ -8,6 +8,7 @@ var fundsContainerEl = document.querySelector("#funds");
 var displayFundsContainerEl = document.querySelector("#view-funds-container");
 var usernameSpanEl = document.querySelector("#username-text");
 var locationSpanEl = document.querySelector("#location-text");
+var totalFundsViewEl = document.querySelector("#funds-amount");
 
 // Buttons
 var startGameButton = document.querySelector("#quick");
@@ -48,6 +49,7 @@ var betAmountInput = document.querySelector("#bet-amount");
 // Stores deck ID
 var deckID;
 
+// Stores current card hand values
 var currentUserHandValue;
 var currentDealerHandValue;
 
@@ -61,13 +63,13 @@ var userCardDeal;
 // Holds number of cards user has
 var userCardCount;
 
+// Stores total available funds
 var totalFunds;
+
+// Stores bet amount for each game
 var betAmount;
 
-var totalFundsViewEl = document.querySelector("#funds-amount");
-
 const numberOfCardsAtStart = 2;
-
 
 // Run on page load
 function init()
@@ -110,9 +112,11 @@ function init()
     {
         getFunds();
     }
+
     getLocation();
 }
 
+// Call geolocation API to get user location
 function getLocation()
 {
     var locationRequestUrl = "https://get.geojs.io/v1/ip/geo.json";
@@ -123,13 +127,12 @@ function getLocation()
         })
         .then(function (data)
         {
-            console.log(data);
             var city = data.city;
             var state = data.region;
+
             usernameSpanEl.textContent = localStorage.getItem("Username");
             locationSpanEl.textContent = city + ", " + state;
-
-        })
+        });
 }
 
 // Show get username modal
@@ -173,8 +176,6 @@ function getDeck()
         })
         .then(function (data)
         {
-            console.log(data);
-
             // Get deck ID from API
             deckID = data.deck_id;
             console.log(deckID);
@@ -188,8 +189,6 @@ function getDeck()
 async function drawCard()
 {
     var drawCardRequestURL = 'https://deckofcardsapi.com/api/deck/' + deckID + '/draw/?count=1';
-
-    console.log(drawCardRequestURL);
     
     var response = fetch(drawCardRequestURL)
         .then(function (response)
@@ -198,10 +197,7 @@ async function drawCard()
         })
         .then(function (data)
         {
-            console.log(data);
-
             var card = data.cards[0].image;
-            console.log(card);
 
             if (userCardDeal)
             {
@@ -230,8 +226,6 @@ async function drawCard()
             {
                 cardValue = 10;
             }
-
-            console.log("Card value: " + cardValue);
 
             return parseInt(cardValue);
         });
@@ -346,12 +340,9 @@ async function hit()
 {
     // Will draw card and return value
     var drawnCardValue = await drawCard();
-    console.log("Drawn card value after hit: " + drawnCardValue);
 
     currentUserHandValue = parseInt(currentUserHandValue) + drawnCardValue;
     console.log("Current hand value: " + currentUserHandValue);
-
-    console.log(userCardImages);
 
     userCardCount++;
 
@@ -372,6 +363,7 @@ function stay()
     determineWinner();
 }
 
+// Win condition
 function win()
 {
     hitButton.hidden = true;
@@ -381,13 +373,12 @@ function win()
     winModalTextEl.textContent = "Congradulations, you win " + (betAmount * 2) + " dollars";
     winModalEl.show();
 
-    console.log("Congradulations your win " + (betAmount * 2) + " dollars");
-
     totalFunds = totalFunds + (betAmount * 2);
 
     localStorage.setItem("Total funds", totalFunds);
 }
 
+// Lose condition
 function lose()
 {
     hitButton.hidden = true;
@@ -405,10 +396,9 @@ function lose()
         loseModalTextEl.textContent = "Sorry you lost " + betAmount + " dollars";
         loseModalEl.show();
     }
-
-    console.log("Sorry you lost " + betAmount + " dollars");
 }
 
+// Tie condition
 function tie()
 {
     hitButton.hidden = true;
@@ -427,8 +417,6 @@ function tie()
         tieModalEl.show();
     }
 
-    console.log("Game is tied.  " + betAmount + " dollars are being returned to your total funds");
-
     totalFunds = parseInt(totalFunds) + parseInt(betAmount);
 
     localStorage.setItem("Total funds", totalFunds);
@@ -440,6 +428,7 @@ function reset()
     location.reload();
 }
 
+// Draws cards for user and dealer
 async function roundStart()
 {
     totalFunds = parseInt(localStorage.getItem("Total funds"));
@@ -469,9 +458,6 @@ async function roundStart()
 
     console.log("Dealer initial cards value: " + currentDealerHandValue);
     console.log("User initial cards value: " + currentUserHandValue);
-    
-    console.log(userCardImages);
-    console.log(dealerCardImages);
 
     // Append images of user cards
     for (var i = 0; i < numberOfCardsAtStart; i++)
@@ -485,6 +471,7 @@ async function roundStart()
     checkForWinner();
 }
 
+// Displays modal to place bet at start of game
 function placeBet(event)
 {
     // Get total funds from local storage
@@ -497,27 +484,6 @@ function placeBet(event)
     betAmount = betAmountInput.value;
 
     parseInt(betAmount);
-
-    /*
-    if (betAmount > totalFunds || betAmount <= 0)
-    {
-        location.reload();
-    }
-    */
-
-    // Get be amount for game from user and make sure that it is less than or equal to total available funds
-    /*
-    do
-    {
-        betAmountModalEl.show();
-
-        // betAmount = saveBetAmount();
-
-        // betAmount = window.prompt("How much would you like to bet?");
-        // parseInt(betAmount);
-    }
-    while (betAmount > totalFunds && betAmount > 0);
-    */
 
     // Remove bet amount from total funds and set local storage value
     totalFunds = totalFunds - betAmount;
@@ -554,6 +520,7 @@ function clearFunds()
     }
 }
 
+// Sets initial values and begins game
 function startGame()
 {
     // Hide/Show HTML elements
